@@ -1,21 +1,29 @@
 package com.geowarin.graphql
 
-import graphql.*
-import graphql.ExecutionInput.*
-import org.springframework.context.annotation.*
+import graphql.ExecutionInput.newExecutionInput
+import graphql.ExecutionResult
+import graphql.GraphQL
+import graphql.execution.instrumentation.dataloader.DataLoaderDispatcherInstrumentation
+import org.dataloader.DataLoaderRegistry
+import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Configuration
 import org.springframework.core.io.ClassPathResource
-import org.springframework.http.*
-import org.springframework.web.reactive.function.server.*
-import org.springframework.web.reactive.function.server.ServerResponse.*
+import org.springframework.http.HttpMethod
+import org.springframework.http.MediaType
+import org.springframework.web.reactive.function.server.ServerRequest
+import org.springframework.web.reactive.function.server.ServerResponse.badRequest
+import org.springframework.web.reactive.function.server.ServerResponse.ok
+import org.springframework.web.reactive.function.server.router
 import reactor.core.publisher.Mono
 import reactor.core.publisher.Mono.*
 import java.net.URLDecoder
 
 val GraphQLMediaType = MediaType.parseMediaType("application/GraphQL")
-val schema = buildSchema()
 
 @Configuration
-class Routes {
+class Routes(private val userRepository: UserRepository, private val companyRepository: CompanyRepository) {
+
+  private val schema = buildSchema(userRepository, companyRepository)
 
   @Bean
   fun routesFun() = router {
@@ -27,19 +35,25 @@ class Routes {
         .switchIfEmpty(badRequest().build())
     }
   }
-}
 
-fun executeGraphQLQuery(graphQLParameters: GraphQLParameters): Mono<ExecutionResult> {
-  val executionInput = newExecutionInput()
-    .query(graphQLParameters.query)
-    .operationName(graphQLParameters.operationName)
-    .variables(graphQLParameters.variables)
+  fun executeGraphQLQuery(graphQLParameters: GraphQLParameters): Mono<ExecutionResult> {
+    val companyDataLoader = CompanyDataLoader(companyRepository)
+    val registry = DataLoaderRegistry()
+    registry.register("Company", companyDataLoader)
 
-  val graphQL = GraphQL
-    .newGraphQL(schema)
-    .build()
+    val executionInput = newExecutionInput()
+      .query(graphQLParameters.query)
+      .operationName(graphQLParameters.operationName)
+      .variables(graphQLParameters.variables)
+      .context(registry)
 
-  return fromFuture(graphQL.executeAsync(executionInput))
+    val graphQL = GraphQL
+      .newGraphQL(schema)
+      .instrumentation(DataLoaderDispatcherInstrumentation(registry))
+      .build()
+
+    return fromFuture(graphQL.executeAsync(executionInput))
+  }
 }
 
 fun getGraphQLParameters(req: ServerRequest): Mono<GraphQLParameters> = when {
