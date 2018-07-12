@@ -1,14 +1,16 @@
-# GraphQL, Spring WebFlux, DataLoader
+# GraphQL, Spring WebFlux, DataLoader, JOOQ
 
 This is a sample GraphQL application written in kotlin that
 uses [graphql-java](https://github.com/graphql-java/graphql-java) and spring webflux (with spring-boot 2),
-additionally using [java-dataloader](https://github.com/graphql-java/java-dataloader). This is forked from
+additionally using [java-dataloader](https://github.com/graphql-java/java-dataloader) and
+[jooq](https://www.jooq.org/). This is forked from
 https://github.com/geowarin/graphql-webflux, to show how support for DataLoader can be added.
 
 When browsing the application on `localhost:8080`, you will see the [GraphiQL](https://github.com/graphql/graphiql) explorer.
 
 ## Current Status
 * DataLoader added.
+* JOOQ added.
 * Example data structure created (customers, companies)
 * H2 data access implemented
 
