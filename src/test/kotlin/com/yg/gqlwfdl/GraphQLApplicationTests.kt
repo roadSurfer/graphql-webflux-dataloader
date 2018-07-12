@@ -1,4 +1,4 @@
-package com.geowarin.graphql
+package com.yg.gqlwfdl
 
 import org.assertj.core.api.Assertions.*
 import org.junit.jupiter.api.*
