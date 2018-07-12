@@ -1,13 +1,20 @@
-# GraphQL and Spring Webflux
+# GraphQL, Spring WebFlux, DataLoader
 
 This is a sample GraphQL application written in kotlin that
-uses [graphQL-java](https://github.com/graphql-java/graphql-java) and spring webflux (with spring-boot 2),
-additionally using [java-dataloader] (https://github.com/graphql-java/java-dataloader). This is forked from
+uses [graphql-java](https://github.com/graphql-java/graphql-java) and spring webflux (with spring-boot 2),
+additionally using [java-dataloader](https://github.com/graphql-java/java-dataloader). This is forked from
 https://github.com/geowarin/graphql-webflux, to show how support for DataLoader can be added.
 
-When browsing the application on `localhost:8080`, you will see the [graphiQL](https://github.com/graphql/graphiql) explorer.
+When browsing the application on `localhost:8080`, you will see the [GraphiQL](https://github.com/graphql/graphiql) explorer.
 
-## Current status
+## Current Status
+* DataLoader added.
+* Example data structure created (customers, companies)
+* H2 data access implemented
 
-Initial checkin with DataLoader added. Unit tests not yet implemented, and no real database access (just dummy data).
-Explanation of how it all hangs together still to be added.
+## To Do
+* When populating data from GraphQL resolvers, prime data into data loaders to avoid redundant re-fetching in subsequent resolvers.
+* Add functionality to automatically add joins to relevant tables when querying the database, based on requested GraphQL fields.
+* Document explaining how it all hangs together still to be added.
+* Code comments.
+* Unit tests.
