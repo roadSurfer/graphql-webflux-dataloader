@@ -10,4 +10,8 @@ class CustomerResolver : DataLoadingResolver(), GraphQLResolver<Customer> {
 
     fun company(customer: Customer, env: DataFetchingEnvironment): CompletableFuture<Company> =
             env.dataLoader<Long, Company>("Company", true).load(customer.companyId)
+
+    fun outOfOfficeDelegate(customer: Customer, env: DataFetchingEnvironment): CompletableFuture<Customer> =
+            if (customer.outOfOfficeDelegate == null) CompletableFuture.completedFuture(null)
+            else env.dataLoader<Long, Customer>("Customer", true).load(customer.outOfOfficeDelegate)
 }

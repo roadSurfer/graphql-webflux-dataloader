@@ -10,6 +10,7 @@ fun logMessage(message: String, includeThreadName: Boolean = true) {
     println("$timestamp$threadInfo :: $message")
 }
 
+// TODO: remove this eventually?
 fun <T> withLogging(taskDescription: String, handler: () -> CompletableFuture<T>): CompletableFuture<T> {
     logMessage("${taskDescription.capitalize()}...")
     return handler().whenComplete { result, error ->

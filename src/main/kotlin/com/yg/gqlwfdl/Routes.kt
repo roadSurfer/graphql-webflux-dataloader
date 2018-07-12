@@ -4,6 +4,7 @@ import com.coxautodev.graphql.tools.SchemaParser
 import com.coxautodev.graphql.tools.SchemaParserOptions
 import com.yg.gqlwfdl.dataaccess.DbConfig
 import com.yg.gqlwfdl.dataloaders.CompanyDataLoader
+import com.yg.gqlwfdl.dataloaders.CustomerDataLoader
 import com.yg.gqlwfdl.dataloaders.DataLoaderFetchContext
 import com.yg.gqlwfdl.resolvers.CustomerResolver
 import com.yg.gqlwfdl.resolvers.Query
@@ -52,6 +53,7 @@ class Routes(private val customerService: CustomerService,
         val registry = DataLoaderRegistry()
         val requestContext = RequestContext(registry, dbConfig)
         registry.register("Company", CompanyDataLoader(requestContext, DataLoaderFetchContext(), companyService))
+        registry.register("Customer", CustomerDataLoader(requestContext, DataLoaderFetchContext(), customerService))
 
         val executionInput = newExecutionInput()
                 .query(graphQLParameters.query)

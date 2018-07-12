@@ -3,6 +3,7 @@ type Customer {
   firstName: String!
   lastName: String!
   company: Company!
+  outOfOfficeDelegate: Customer
 }
 
 type Company {
@@ -13,6 +14,7 @@ type Company {
 
 type Query {
   customers: [Customer]
+  customersByIds(ids: [Int]!): [Customer]
   companies: [Company]
 }
 

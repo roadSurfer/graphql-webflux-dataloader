@@ -1,5 +1,5 @@
 package com.yg.gqlwfdl.services
 
-data class Customer(val id: Long, val firstName: String, val lastName: String, val companyId: Long)
+data class Customer(val id: Long, var firstName: String, var lastName: String, var companyId: Long, var outOfOfficeDelegate: Long? = null)
 
-data class Company(val id: Long, val name: String, val address: String)
+data class Company(val id: Long, var name: String, var address: String)
