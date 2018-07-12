@@ -18,3 +18,4 @@ When browsing the application on `localhost:8080`, you will see the [GraphiQL](h
 * Document explaining how it all hangs together still to be added.
 * Code comments.
 * Unit tests.
+
