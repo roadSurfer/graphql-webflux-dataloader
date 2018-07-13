@@ -10,11 +10,13 @@ import com.yg.gqlwfdl.resolvers.CustomerResolver
 import com.yg.gqlwfdl.resolvers.Query
 import com.yg.gqlwfdl.services.CompanyService
 import com.yg.gqlwfdl.services.CustomerService
+import graphql.ExecutionInput
 import graphql.ExecutionInput.newExecutionInput
 import graphql.ExecutionResult
 import graphql.GraphQL
 import graphql.execution.instrumentation.dataloader.DataLoaderDispatcherInstrumentation
 import graphql.schema.GraphQLSchema
+import org.dataloader.DataLoader
 import org.dataloader.DataLoaderRegistry
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -31,6 +33,10 @@ import java.net.URLDecoder
 
 private val GraphQLMediaType = MediaType.parseMediaType("application/GraphQL")
 
+/**
+ * Manages setting up the GraphQL entry points and serving them. Also responsible for reading the GraphQL schema
+ * and setting up the GraphQL environment.
+ */
 @Configuration
 class Routes(private val customerService: CustomerService,
              private val companyService: CompanyService,
@@ -38,6 +44,9 @@ class Routes(private val customerService: CustomerService,
 
     private val schema = buildSchema(customerService, companyService)
 
+    /**
+     * Sets up the routes (i.e. handles GET and POST to /graphql, and also serves up the graphiql HTML page).
+     */
     @Bean
     fun router() = router {
         GET("/", serveStatic(ClassPathResource("/graphiql.html")))
@@ -49,7 +58,16 @@ class Routes(private val customerService: CustomerService,
         }
     }
 
+    /**
+     * Handles an individual GraphQL request. Sets up the [ExecutionInput] and [GraphQL] objects and processes them
+     * asynchronously by calling [GraphQL.executeAsync]. Also sets up all the [DataLoader]s and registers them so
+     * they're available for this whole request. The setup performed below is inexpensive (as opposed to parsing the
+     * schema file and building the schema, which is expensive), so it can be done at the start of each request.
+     * This is how request-scoped data loaders can be defined.
+     */
     private fun executeGraphQLQuery(graphQLParameters: GraphQLParameters): Mono<ExecutionResult> {
+        // Create a data loader registry and register all the data loader into it. Wrap this in a RequestContext
+        // object, and make this available to all the resolvers via the execution input's "context" property.
         val registry = DataLoaderRegistry()
         val requestContext = RequestContext(registry, dbConfig)
         registry.register("Company", CompanyDataLoader(requestContext, DataLoaderFetchContext(), companyService))
@@ -59,6 +77,12 @@ class Routes(private val customerService: CustomerService,
                 .query(graphQLParameters.query)
                 .operationName(graphQLParameters.operationName)
                 .variables(graphQLParameters.variables)
+                // By putting an object into the execution input's context, the GraphQL resolvers will be able to
+                // access this object (it's an optional parameter into all resolver methods, e.g. Query.customers).
+                // That's the way that we make the data loaders available to the resolvers: they can get them from
+                // the object in the context.  Note that any arbitrary object can be put into context.  In most
+                // examples it's the DataLoaderRegistry which is put in here.  However to allow for more data to be
+                // added in future if required, here we wrap the registry in a custom object, RequestContext.
                 .context(requestContext)
 
         val graphQL = GraphQL
@@ -96,6 +120,10 @@ private fun getVariables(req: ServerRequest): Map<String, Any>? {
             .orElseGet { null }
 }
 
+/**
+ * Reads the GraphQL schema (resources/schema.graphqls), sets up the resolvers for it, builds it, and returns it.
+ * This operation can be expensive so is done once, on application startup.
+ */
 private fun buildSchema(customerService: CustomerService, companyService: CompanyService): GraphQLSchema {
 
     return SchemaParser.newParser()

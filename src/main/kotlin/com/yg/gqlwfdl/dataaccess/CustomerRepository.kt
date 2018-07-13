@@ -4,9 +4,16 @@ import com.yg.gqlwfdl.yg.db.public_.Tables.CUSTOMER
 import com.yg.gqlwfdl.yg.db.public_.tables.records.CustomerRecord
 import org.jooq.DSLContext
 import java.util.concurrent.Executor
+import org.springframework.stereotype.Repository as SpringRepository
 
+/**
+ * Repository providing access to customer information.
+ */
 interface CustomerRepository : Repository<Long, CustomerRecord>
 
-@org.springframework.stereotype.Repository
+/**
+ * Concrete implementation of [CustomerRepository].
+ */
+@SpringRepository
 class CustomerRepositoryImpl(create: DSLContext, asyncExecutor: Executor)
     : RepositoryImpl<Long, CustomerRecord>(create, asyncExecutor, CUSTOMER, CUSTOMER.ID), CustomerRepository

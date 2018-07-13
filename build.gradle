@@ -101,6 +101,12 @@ jooq {
     }
 }
 
+// Only generate the jOOQ wrappers from the database if explicitly requested, not as part of a normal build.
+generateTablesJooqSchemaSource.onlyIf { name != 'build' }
+
+// The below is required to make the gradle task for generating the jOOQ wrappers work with Java 10.
+// See https://github.com/jOOQ/jOOQ/issues/6477 and https://github.com/etiennestuder/gradle-jooq-plugin/issues/55
+// for more details.
 tasks.generateTablesJooqSchemaSource.with {
     javaExecSpec = { JavaExecSpec s ->
         s.jvmArgs '--add-modules', 'java.xml.bind'

@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.type.TypeFactory
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import java.util.*
 
+// Miscellaneous utilities related to JSON handling using the Jackson libraries.
+
 val MapTypeRef: MapType =
         TypeFactory.defaultInstance().constructMapType(HashMap::class.java, String::class.java, Any::class.java)
 

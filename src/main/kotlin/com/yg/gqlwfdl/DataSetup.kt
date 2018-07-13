@@ -7,6 +7,9 @@ import java.sql.ResultSet
 import java.sql.Statement
 import java.util.*
 
+/**
+ * Used to create test data.
+ */
 class DataSetup(private val dbUrl: String) {
     fun execute() {
         DriverManager.getConnection(dbUrl, "sa", "").use {

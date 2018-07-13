@@ -24,3 +24,7 @@ nbbuild/
 dist/
 nbdist/
 .nb-gradle/
+
+### H2-generated files ###
+test.mv.db
+test.trace.db

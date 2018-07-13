@@ -8,6 +8,8 @@ import org.springframework.web.reactive.function.server.ServerResponse
 import org.springframework.web.reactive.function.server.bodyToMono
 import reactor.core.publisher.Mono
 
+// Miscellaneous utility functions related to ServerRequest and ServerResponse objects.
+
 fun ServerRequest.contentTypeIs(mediaType: MediaType) =
         this.headers().contentType().filter { it.isCompatibleWith(mediaType) }.isPresent
 
