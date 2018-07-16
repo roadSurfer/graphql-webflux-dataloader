@@ -1,10 +1,7 @@
 package com.yg.gqlwfdl.dataaccess
 
 import com.yg.gqlwfdl.withLogging
-import org.jooq.DSLContext
-import org.jooq.Table
-import org.jooq.TableField
-import org.jooq.UpdatableRecord
+import org.jooq.*
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Executor
 
@@ -19,14 +16,21 @@ interface Repository<TId, TRecord : UpdatableRecord<TRecord>> {
     /**
      * Returns a [CompletableFuture] which, when completed, will provide a [List] of all the [TRecord] items in the
      * underlying database table.
+     *
+     * @param recordListener The listener to inform whenever a record is found. This is done by calling it
+     * [RecordListener.onRecordsReceived] function.
      */
-    fun findAll(): CompletableFuture<out List<TRecord>>
+    fun findAll(recordListener: RecordListener? = null): CompletableFuture<List<TRecord>>
 
     /**
      * Returns a [CompletableFuture] which, when completed, will provide a [List] of all the [TRecord] items which have
      * the passed in IDs, in the underlying database table.
+     *
+     * @param ids The IDs of the items to be found.
+     * @param recordListener The listener to inform whenever a record is found. This is done by calling it
+     * [RecordListener.onRecordsReceived] function.
      */
-    fun findByIds(ids: List<TId>): CompletableFuture<out List<TRecord>>
+    fun findByIds(ids: List<TId>, recordListener: RecordListener? = null): CompletableFuture<List<TRecord>>
 }
 
 /**
@@ -45,13 +49,26 @@ abstract class RepositoryImpl<TId, TRecord : UpdatableRecord<TRecord>>(
         private val table: Table<TRecord>,
         private val idField: TableField<TRecord, TId>) : Repository<TId, TRecord> {
 
-    override fun findAll(): CompletableFuture<out List<TRecord>> =
+    override fun findAll(recordListener: RecordListener?): CompletableFuture<List<TRecord>> =
             withLogging("querying ${table.name} for all records") {
-                create.selectFrom(table).fetchAsync(asyncExecutor).toCompletableFuture()
+                find(recordListener)
             }
 
-    override fun findByIds(ids: List<TId>): CompletableFuture<out List<TRecord>> =
+    override fun findByIds(ids: List<TId>, recordListener: RecordListener?): CompletableFuture<List<TRecord>> =
             withLogging("querying ${table.name} for records with IDs $ids") {
-                create.selectFrom(table).where(idField.`in`(ids)).fetchAsync(asyncExecutor).toCompletableFuture()
+                find(recordListener, listOf(idField.`in`(ids)))
             }
+
+    // TODO: if doing joins, can we still use UpdatableRecord, or just TableRecord?
+    // TODO: document the newly added methods below once join functionality implemented.
+
+    private fun find(recordListener: RecordListener?, conditions: List<Condition>? = null): CompletableFuture<List<TRecord>> {
+        return create.select().from(table).withConditions(conditions)
+                .fetchAsync()
+                .thenApply { it.map { it.also { recordListener?.onRecordsReceived(listOf(it)) }.into(table) } }
+                .toCompletableFuture()
+    }
+
+    private fun SelectJoinStep<Record>.withConditions(conditions: List<Condition>?): SelectConnectByStep<Record> =
+            if (conditions != null && conditions.any()) this.where(conditions) else this
 }

@@ -3,9 +3,7 @@ package com.yg.gqlwfdl
 import com.coxautodev.graphql.tools.SchemaParser
 import com.coxautodev.graphql.tools.SchemaParserOptions
 import com.yg.gqlwfdl.dataaccess.DbConfig
-import com.yg.gqlwfdl.dataloaders.CompanyDataLoader
-import com.yg.gqlwfdl.dataloaders.CustomerDataLoader
-import com.yg.gqlwfdl.dataloaders.DataLoaderFetchContext
+import com.yg.gqlwfdl.dataloaders.DataLoaderFactory
 import com.yg.gqlwfdl.resolvers.CustomerResolver
 import com.yg.gqlwfdl.resolvers.Query
 import com.yg.gqlwfdl.services.CompanyService
@@ -40,7 +38,8 @@ private val GraphQLMediaType = MediaType.parseMediaType("application/GraphQL")
 @Configuration
 class Routes(private val customerService: CustomerService,
              private val companyService: CompanyService,
-             private val dbConfig: DbConfig) {
+             private val dbConfig: DbConfig,
+             private val dataLoaderFactory: DataLoaderFactory) {
 
     private val schema = buildSchema(customerService, companyService)
 
@@ -70,8 +69,7 @@ class Routes(private val customerService: CustomerService,
         // object, and make this available to all the resolvers via the execution input's "context" property.
         val registry = DataLoaderRegistry()
         val requestContext = RequestContext(registry, dbConfig)
-        registry.register("Company", CompanyDataLoader(requestContext, DataLoaderFetchContext(), companyService))
-        registry.register("Customer", CustomerDataLoader(requestContext, DataLoaderFetchContext(), customerService))
+        dataLoaderFactory.createAllAndRegister(registry, requestContext)
 
         val executionInput = newExecutionInput()
                 .query(graphQLParameters.query)

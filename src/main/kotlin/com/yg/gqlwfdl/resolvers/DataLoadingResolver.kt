@@ -1,9 +1,7 @@
 package com.yg.gqlwfdl.resolvers
 
-import com.yg.gqlwfdl.RequestContext
 import com.yg.gqlwfdl.dataloaders.ContextAwareDataLoader
 import graphql.schema.DataFetchingEnvironment
-import org.dataloader.DataLoaderRegistry
 
 /**
  * Abstract base class for all resolvers for domain level objects. Provides access to properties which the GraphQL
@@ -14,19 +12,13 @@ import org.dataloader.DataLoaderRegistry
 abstract class DataLoadingResolver {
 
     /**
-     * Gets a data loader from the receiver (a [DataFetchingEnvironment]), which is registered with the passed in key.
+     * Prepares the data loader for use by this resolver, based on the passed in environment.
      *
-     * @param K The type of the key which the items cached by the requested data loader are stored (i.e. the type of
-     * its unique identifier).
-     * @param V The type of the objects cached by the requested data loader.
-     * @param key The key with which the data loader is registered in the [DataLoaderRegistry]
-     * @param addFieldToContext TODO: document when implemented/used.
+     * @param dataLoaderCreator A function which will create the data loader
+     * @param env The current [DataFetchingEnvironment], containing the field which is currently being populated, and
+     * which caused this loader to be called. This is added to the returned [ContextAwareDataLoader]'s
+     * [ContextAwareDataLoader.sourceGraphQLFields].
      */
-    protected fun <K, V> DataFetchingEnvironment.dataLoader(key: String, addFieldToContext: Boolean = false)
-            : ContextAwareDataLoader<K, V> {
-        val dataLoader = this.getContext<RequestContext>().dataLoader<K, V>(key)
-        if (addFieldToContext)
-            dataLoader.dataLoaderFetchContext.sourceFields.add(this.field)
-        return dataLoader
-    }
+    protected fun <K, V> prepareDataLoader(env: DataFetchingEnvironment, dataLoaderCreator: () -> ContextAwareDataLoader<K, V>) =
+            dataLoaderCreator().also { it.sourceGraphQLFields.add(env.field) }
 }
