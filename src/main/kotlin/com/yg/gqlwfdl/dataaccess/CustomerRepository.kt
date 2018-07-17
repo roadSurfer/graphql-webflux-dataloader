@@ -4,6 +4,7 @@ import com.yg.gqlwfdl.yg.db.public_.Tables.CUSTOMER
 import com.yg.gqlwfdl.yg.db.public_.tables.records.CustomerRecord
 import org.jooq.DSLContext
 import java.util.concurrent.Executor
+import com.yg.gqlwfdl.yg.db.public_.Tables.COMPANY as COMPANY_TABLE
 import org.springframework.stereotype.Repository as SpringRepository
 
 /**

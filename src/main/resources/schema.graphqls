@@ -10,6 +10,7 @@ type Company {
   id: ID!
   name: String!
   address: String!
+  primaryContact: Customer
 }
 
 type Query {

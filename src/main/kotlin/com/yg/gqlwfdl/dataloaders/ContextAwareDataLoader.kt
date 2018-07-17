@@ -26,7 +26,7 @@ import java.util.concurrent.CompletionStage
  * @param loader The function which is used to retrieve a list of objects of type [V] based on a list of their keys, of
  * type [K].
  *
- * TODO: this currently isn't using the context objects, but will do when joins are implemented. Confirm this when done.
+ * TODO: this currently isn't using the requestContext objects: will it?  If not, should it be renamed?
  */
 class ContextAwareDataLoader<K, V>(private val requestContext: RequestContext,
                                    private val keyFetcher: (V) -> K,

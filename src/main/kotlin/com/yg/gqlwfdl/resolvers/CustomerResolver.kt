@@ -13,18 +13,18 @@ import java.util.concurrent.CompletableFuture
  * Resolver for [Customer]s. Provides access to properties which the GraphQL schema exposes of these objects, but which
  * don't exist directly on the domain model object (Customer in this case), and need to be queried for separately. This
  * is done by delegating the work to the data loaders, so that the N+1 problem is bypassed, and the fetches can be
- * batches in one single call.
+ * batched in one single call.
  */
 class CustomerResolver : DataLoadingResolver(), GraphQLResolver<Customer> {
 
     /**
-     * Gets a [CompletableFuture] which, when completed, when return the company for the passed in customer.
+     * Gets a [CompletableFuture] which, when completed, will return the company for the passed in customer.
      */
     fun company(customer: Customer, env: DataFetchingEnvironment): CompletableFuture<Company> =
             prepareDataLoader(env) { env.requestContext.companyDataLoader }.load(customer.companyId)
 
     /**
-     * Gets a [CompletableFuture] which, when completed, when return the out-of-office delegate for the passed in
+     * Gets a [CompletableFuture] which, when completed, will return the out-of-office delegate for the passed in
      * customer.
      *
      * This might return null.

@@ -33,6 +33,8 @@ startup so you can immediately make a call such as:
 * JOOQ added.
 * Example data structure created (customers, companies)
 * H2 data access implemented
+* Data loaded by services, and from GraphQL resolvers, primed into data loaders to avoid redundant re-fetching in subsequent resolvers.
+* Joins added (i.e. joins automatically added based on requested GraphQL fields)
 
 ## Pre-Requisites
 Some settings in some of the files (e.g. gradle.properties and build.gradle) mean that as things currently stand
@@ -43,8 +45,10 @@ However to get it working in Java 8 should be possible by removing the calls to 
 mentioned, and possibly some other tweaking.
 
 ## To Do
-* When populating data from GraphQL resolvers, prime data into data loaders to avoid redundant re-fetching in subsequent resolvers.
-* Add functionality to automatically add joins to relevant tables when querying the database, based on requested GraphQL fields.
+* Update repositories: they should return entities, not JOOQ records.
+* Add support for repositories based on multiple underlying database tables (and add example of this).
+* Add mutations.
 * Document explaining how it all hangs together.
 * Unit tests.
 * Test error handling (esp in async code)
+* Implement all TODOs in the code.

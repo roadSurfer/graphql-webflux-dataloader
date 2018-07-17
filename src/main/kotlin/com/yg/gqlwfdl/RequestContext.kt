@@ -3,6 +3,7 @@ package com.yg.gqlwfdl
 import com.yg.gqlwfdl.dataaccess.DbConfig
 import com.yg.gqlwfdl.dataloaders.ContextAwareDataLoader
 import com.yg.gqlwfdl.dataloaders.DataLoaderType
+import com.yg.gqlwfdl.services.DataLoaderPrimerRecordListener
 import graphql.ExecutionInput
 import graphql.language.Field
 import graphql.schema.DataFetchingEnvironment
@@ -15,12 +16,8 @@ import org.dataloader.DataLoaderRegistry
  * access to the [DataLoaderRegistry] so that the resolvers have access to the (request-scoped) data loaders.
  *
  * @property dataLoaderRegistry The registry of data loaders which provides access to the data loaders.
- * @property dbConfig The database configuration object, which provides access to the executor used to perform database
- * actions asynchronously on a thread from a dedicated thread pool.
  */
-class RequestContext(private val dataLoaderRegistry: DataLoaderRegistry,
-        // TODO: confirm that dbConfig is definitely required.
-                     val dbConfig: DbConfig) {
+class RequestContext(private val dataLoaderRegistry: DataLoaderRegistry) {
 
     /**
      * Gets a data loader registered with the passed in key, in the current request context. Throws an exception if no
@@ -31,8 +28,10 @@ class RequestContext(private val dataLoaderRegistry: DataLoaderRegistry,
      * @param V The type of the objects cached by the requested data loader.
      * @param type The type of the data loader being requested.
      */
-    fun <K, V> dataLoader(type: DataLoaderType, sourceField: Field? = null) =
+    fun <K, V> dataLoader(type: DataLoaderType) =
             dataLoaderRegistry.getDataLoader<K, V>(type.registryKey)!! as ContextAwareDataLoader
+
+    val dataLoaderPrimerRecordListener = DataLoaderPrimerRecordListener(this)
 }
 
 /**

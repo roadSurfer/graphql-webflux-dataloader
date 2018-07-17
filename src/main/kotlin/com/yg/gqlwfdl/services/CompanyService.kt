@@ -2,8 +2,11 @@ package com.yg.gqlwfdl.services
 
 import com.yg.gqlwfdl.RequestContext
 import com.yg.gqlwfdl.dataaccess.CompanyRepository
+import com.yg.gqlwfdl.dataaccess.toJoinDefinitions
 import com.yg.gqlwfdl.dataloaders.DataLoaderType
+import com.yg.gqlwfdl.requestContext
 import com.yg.gqlwfdl.yg.db.public_.tables.records.CompanyRecord
+import graphql.schema.DataFetchingEnvironment
 import org.springframework.stereotype.Service
 import java.util.concurrent.CompletableFuture
 
@@ -17,34 +20,34 @@ class CompanyService(private val companyRepository: CompanyRepository) {
     /**
      * Returns a [CompletableFuture] which, when completed, will provide a [List] of all [Company] objects.
      *
-     * @param requestContext The context of the current request, if any. Used to get the relevant data loader to prime
-     * with any items retrieved from the repository, so that subsequent calls can use those pre-cached items rather
-     * than having to query again for them.
+     * @param env The environment for the current GraphQL data fetch, if this method is called from such a context.
      */
-    fun findAll(requestContext: RequestContext? = null): CompletableFuture<List<Company>> =
-            companyRepository.findAll().toEntityListCompletableFuture(requestContext)
+    fun findAll(env: DataFetchingEnvironment? = null): CompletableFuture<List<Company>> =
+            companyRepository
+                    .findAll(
+                            env?.field?.toJoinDefinitions(companyRepository.table),
+                            env?.requestContext?.dataLoaderPrimerRecordListener)
+                    .toEntityListCompletableFuture()
 
     /**
      * Returns a [CompletableFuture] which, when completed, will provide a [List] of all [Company] objects with the
      * passed in IDs.
      *
-     * @param requestContext The context of the current request, if any. Used to get the relevant data loader to prime
-     * with any items retrieved from the repository, so that subsequent calls can use those pre-cached items rather
-     * than having to query again for them.
+     * @param env The environment for the current GraphQL data fetch, if this method is called from such a context.
      */
-    fun findByIds(ids: List<Long>, requestContext: RequestContext? = null): CompletableFuture<List<Company>> =
-            companyRepository.findByIds(ids).toEntityListCompletableFuture(requestContext)
+    fun findByIds(ids: List<Long>, env: DataFetchingEnvironment? = null): CompletableFuture<List<Company>> =
+            companyRepository
+                    .findByIds(ids,
+                            env?.field?.toJoinDefinitions(companyRepository.table),
+                            env?.requestContext?.dataLoaderPrimerRecordListener)
+                    .toEntityListCompletableFuture()
 
     /**
      * Converts a [CompletableFuture] which wraps an [Iterable] of [CompanyRecord]s to a CompletableFuture which will
      * return a [List] of the corresponding domain model objects (i.e. [Company]).
-     *
-     * @param requestContext The context of the current request, if any. Used to get the relevant data loader to prime
-     * with any items retrieved from the repository, so that subsequent calls can use those pre-cached items rather
-     * than having to query again for them.
      */
-    private fun CompletableFuture<out Iterable<CompanyRecord>>.toEntityListCompletableFuture(requestContext: RequestContext?) =
-            this.thenApply { it.map { it.toEntity().also { requestContext?.companyDataLoader?.prime(it) } } }
+    private fun CompletableFuture<out Iterable<CompanyRecord>>.toEntityListCompletableFuture() =
+            this.thenApply { it.map { it.toEntity() } }
 }
 
 /**

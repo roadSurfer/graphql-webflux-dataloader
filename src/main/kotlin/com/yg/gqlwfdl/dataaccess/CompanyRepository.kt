@@ -1,6 +1,7 @@
 package com.yg.gqlwfdl.dataaccess
 
 import com.yg.gqlwfdl.yg.db.public_.Tables.COMPANY
+import com.yg.gqlwfdl.yg.db.public_.Tables.CUSTOMER
 import com.yg.gqlwfdl.yg.db.public_.tables.records.CompanyRecord
 import org.jooq.DSLContext
 import java.util.concurrent.Executor

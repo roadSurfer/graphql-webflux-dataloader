@@ -22,4 +22,5 @@ data class Customer(val id: Long,
 
 data class Company(val id: Long,
                    var name: String,
-                   var address: String)
+                   var address: String,
+                   var primaryContact: Long? = null)

@@ -24,6 +24,30 @@ class DataSetup(private val dbUrl: String) {
         val companies = createCompanies(statement)
         val customers = createCustomers(statement, companies)
         setOutOfOfficeDelegates(statement, customers)
+        setPrimaryContacts(statement, companies, customers)
+    }
+
+    private fun setPrimaryContacts(statement: Statement, companies: List<Company>, customers: List<Customer>) {
+        // Run through all existing companies, and for each one set their primary contact.
+        // There's a 50% chance that this will be null.  If non-null, it will be a randomly chosen user from that company.
+        val customersByCompany = customers.groupBy { it.companyId }
+        val random = Random()
+
+        fun Company.setPrimaryContact() {
+            // Get a list of the people in this company.
+            customersByCompany[this.id]?.let {
+                // Choose a random customer from this list and use them as the primary contact.
+                this.primaryContact = it.randomItem().id
+                statement.execute(
+                        "update company set primary_contact = ${this.primaryContact} where id = ${this.id};")
+            }
+        }
+
+        companies.filter { random.nextBoolean() }.forEach { it.setPrimaryContact() }
+
+        // Make sure that there is at least one company with a primay contact
+        if (companies.all { it.primaryContact == null })
+            companies.randomItem().setPrimaryContact()
     }
 
     private fun setOutOfOfficeDelegates(statement: Statement, customers: List<Customer>) {
@@ -95,7 +119,8 @@ class DataSetup(private val dbUrl: String) {
             | create table company (
             |     id bigint auto_increment not null primary key,
             |     name varchar(255) not null,
-            |     address varchar(255) not null
+            |     address varchar(255) not null,
+            |     primary_contact bigint
             | );
         """.trimMargin())
 

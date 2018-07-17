@@ -4,6 +4,7 @@ import com.coxautodev.graphql.tools.SchemaParser
 import com.coxautodev.graphql.tools.SchemaParserOptions
 import com.yg.gqlwfdl.dataaccess.DbConfig
 import com.yg.gqlwfdl.dataloaders.DataLoaderFactory
+import com.yg.gqlwfdl.resolvers.CompanyResolver
 import com.yg.gqlwfdl.resolvers.CustomerResolver
 import com.yg.gqlwfdl.resolvers.Query
 import com.yg.gqlwfdl.services.CompanyService
@@ -68,7 +69,7 @@ class Routes(private val customerService: CustomerService,
         // Create a data loader registry and register all the data loader into it. Wrap this in a RequestContext
         // object, and make this available to all the resolvers via the execution input's "context" property.
         val registry = DataLoaderRegistry()
-        val requestContext = RequestContext(registry, dbConfig)
+        val requestContext = RequestContext(registry)
         dataLoaderFactory.createAllAndRegister(registry, requestContext)
 
         val executionInput = newExecutionInput()
@@ -128,7 +129,8 @@ private fun buildSchema(customerService: CustomerService, companyService: Compan
             .file("schema.graphqls")
             .resolvers(
                     Query(customerService, companyService),
-                    CustomerResolver())
+                    CustomerResolver(),
+                    CompanyResolver())
             .options(SchemaParserOptions.newOptions()
                     .genericWrappers(SchemaParserOptions.GenericWrapper(Mono::class.java, 0))
                     .build())

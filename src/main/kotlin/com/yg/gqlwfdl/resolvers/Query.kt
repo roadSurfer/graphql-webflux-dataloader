@@ -19,17 +19,17 @@ class Query(private val customerService: CustomerService, private val companySer
      * Gets all customers in the system.
      */
     fun customers(env: DataFetchingEnvironment): CompletableFuture<List<Customer>> =
-            withLogging("getting all customers") { customerService.findAll(env.requestContext) }
+            withLogging("getting all customers") { customerService.findAll(env) }
 
     /**
      * Gets all customers with the passed in IDs.
      */
     fun customersByIds(ids: List<Long>, env: DataFetchingEnvironment): CompletableFuture<List<Customer>> =
-            withLogging("getting customers with IDs $ids") { customerService.findByIds(ids, env.requestContext) }
+            withLogging("getting customers with IDs $ids") { customerService.findByIds(ids, env) }
 
     /**
      * Gets all companies in the system.
      */
     fun companies(env: DataFetchingEnvironment) =
-            withLogging("getting all companies") { companyService.findAll(env.requestContext) }
+            withLogging("getting all companies") { companyService.findAll(env) }
 }
