@@ -8,8 +8,8 @@ import org.jooq.Record
  * other tables. This then ends up defining a hierarchy of join definitions, which can be treated as a single set, e.g.
  * when mapping GraphQL fields to database joins.
  *
- * @param joinDefinition The main join definition.
- * @param subsequentJoins Any subsequent joins from the [JoinDefinition.foreignField] to one or more other tables. If
+ * @property joinDefinition The main join definition.
+ * @property subsequentJoins Any subsequent joins from the [JoinDefinition.foreignField] to one or more other tables. If
  * omitted, an empty list is used, meaning there are no subsequent joins.
  */
 data class NestedJoinDefinition<TPrimaryRecord : Record, TForeignRecord : Record>(

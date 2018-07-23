@@ -14,8 +14,8 @@ import org.jooq.TableField
  * @property name The name of this join. Might match the name of the field in the GraphQL schema which exposes a value
  * which has to be populated by querying a secondary table (although doesn't have to, as a single GraphQL field might
  * require multiple joins to get the required data to populate a response to it).
- * @param primaryField The primary field in the join.
- * @param foreignField The foreign field in the join.
+ * @property primaryField The primary field in the join.
+ * @property foreignField The foreign field in the join.
  */
 data class JoinDefinition<TFieldType : Any, TPrimaryRecord : Record, TForeignRecord : Record>(
         val name: String,

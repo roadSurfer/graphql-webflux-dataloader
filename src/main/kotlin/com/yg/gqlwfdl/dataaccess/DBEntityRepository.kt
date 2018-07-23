@@ -33,7 +33,7 @@ import java.util.concurrent.Executor
  * @property recordToEntityConverterProvider The object to convert [Record]s to [TEntity] objects.
  * @property graphQLFieldToJoinMapper The object to use when finding objects in the context of a GraphQL request, to
  * know which joins to add to the database queries, based on the requested GraphQL fields.
- * @param table The database table which this repository is providing access to. In the case where an entity is based on
+ * @property table The database table which this repository is providing access to. In the case where an entity is based on
  * data from multiple database tables, this should be the primary table (sometimes known as the aggregate root).
  * @property idField The field from the table which stores the unique ID of each record, i.e. the primary key field.
  */
