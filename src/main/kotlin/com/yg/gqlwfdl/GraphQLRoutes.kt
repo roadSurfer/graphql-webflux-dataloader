@@ -38,10 +38,10 @@ private val GraphQLMediaType = MediaType.parseMediaType("application/GraphQL")
  * and setting up the GraphQL environment.
  */
 @Configuration
-class Routes(customerService: CustomerService,
-             companyService: CompanyService,
-             companyPartnershipService: CompanyPartnershipService,
-             private val dataLoaderFactory: DataLoaderFactory) {
+class GraphQLRoutes(customerService: CustomerService,
+                    companyService: CompanyService,
+                    companyPartnershipService: CompanyPartnershipService,
+                    private val dataLoaderFactory: DataLoaderFactory) {
 
     private val schema = buildSchema(customerService, companyService, companyPartnershipService)
 
