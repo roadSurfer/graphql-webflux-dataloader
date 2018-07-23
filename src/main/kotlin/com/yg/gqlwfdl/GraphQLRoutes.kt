@@ -2,11 +2,12 @@ package com.yg.gqlwfdl
 
 import com.coxautodev.graphql.tools.SchemaParser
 import com.coxautodev.graphql.tools.SchemaParserOptions
-import com.yg.gqlwfdl.dataaccess.DbConfig
 import com.yg.gqlwfdl.dataloaders.DataLoaderFactory
 import com.yg.gqlwfdl.resolvers.CompanyResolver
 import com.yg.gqlwfdl.resolvers.CustomerResolver
+import com.yg.gqlwfdl.resolvers.PricingDetailsResolver
 import com.yg.gqlwfdl.resolvers.Query
+import com.yg.gqlwfdl.services.CompanyPartnershipService
 import com.yg.gqlwfdl.services.CompanyService
 import com.yg.gqlwfdl.services.CustomerService
 import graphql.ExecutionInput
@@ -37,12 +38,12 @@ private val GraphQLMediaType = MediaType.parseMediaType("application/GraphQL")
  * and setting up the GraphQL environment.
  */
 @Configuration
-class Routes(private val customerService: CustomerService,
-             private val companyService: CompanyService,
-             private val dbConfig: DbConfig,
+class Routes(customerService: CustomerService,
+             companyService: CompanyService,
+             companyPartnershipService: CompanyPartnershipService,
              private val dataLoaderFactory: DataLoaderFactory) {
 
-    private val schema = buildSchema(customerService, companyService)
+    private val schema = buildSchema(customerService, companyService, companyPartnershipService)
 
     /**
      * Sets up the routes (i.e. handles GET and POST to /graphql, and also serves up the graphiql HTML page).
@@ -123,14 +124,17 @@ private fun getVariables(req: ServerRequest): Map<String, Any>? {
  * Reads the GraphQL schema (resources/schema.graphqls), sets up the resolvers for it, builds it, and returns it.
  * This operation can be expensive so is done once, on application startup.
  */
-private fun buildSchema(customerService: CustomerService, companyService: CompanyService): GraphQLSchema {
+private fun buildSchema(customerService: CustomerService,
+                        companyService: CompanyService,
+                        companyPartnershipService: CompanyPartnershipService): GraphQLSchema {
 
     return SchemaParser.newParser()
             .file("schema.graphqls")
             .resolvers(
-                    Query(customerService, companyService),
+                    Query(customerService, companyService, companyPartnershipService),
                     CustomerResolver(),
-                    CompanyResolver())
+                    CompanyResolver(),
+                    PricingDetailsResolver())
             .options(SchemaParserOptions.newOptions()
                     .genericWrappers(SchemaParserOptions.GenericWrapper(Mono::class.java, 0))
                     .build())

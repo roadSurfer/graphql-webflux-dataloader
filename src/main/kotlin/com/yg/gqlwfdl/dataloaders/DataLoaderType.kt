@@ -5,14 +5,15 @@ import org.dataloader.DataLoaderRegistry
 
 /**
  * Enumeration of all the different types of data loaders available in the system. Each one can be used to create an
- * instance of [ContextAwareDataLoader].
+ * instance of [EntityDataLoader].
  */
 enum class DataLoaderType {
-    COMPANY, CUSTOMER;
+    COMPANY, CUSTOMER, COMPANY_PARTNERSHIP, PRICING_DETAILS;
 
     /**
-     * The key under which this data loader is stored in the [DataLoaderRegistry], exposed by the
-     * [ContextAwareDataLoader.requestContext]'s [RequestContext.dataLoaderRegistry] property.
+     * The key under which this data loader is stored in the [DataLoaderRegistry], stored in the
+     * [RequestContext.dataLoaderRegistry] property.
      */
-    val registryKey = toString()
+    val registryKey
+        get() = toString()
 }

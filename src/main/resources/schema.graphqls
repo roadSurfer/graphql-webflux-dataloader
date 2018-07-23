@@ -4,6 +4,7 @@ type Customer {
   lastName: String!
   company: Company!
   outOfOfficeDelegate: Customer
+  pricingDetails: PricingDetails
 }
 
 type Company {
@@ -11,12 +12,26 @@ type Company {
   name: String!
   address: String!
   primaryContact: Customer
+  pricingDetails: PricingDetails
+}
+
+type CompanyPartnership {
+  id: ID!
+  companyA: Company!
+  companyB: Company!
+}
+
+type PricingDetails {
+  vatRateValue: Float!
+  discountRateValue: Float!
+  preferredPaymentMethodDescription: String!
 }
 
 type Query {
   customers: [Customer]
   customersByIds(ids: [Int]!): [Customer]
   companies: [Company]
+  companyPartnerships: [CompanyPartnership]
 }
 
 schema {

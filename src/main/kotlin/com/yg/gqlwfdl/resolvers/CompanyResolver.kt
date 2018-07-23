@@ -1,13 +1,16 @@
 package com.yg.gqlwfdl.resolvers
 
 import com.coxautodev.graphql.tools.GraphQLResolver
+import com.yg.gqlwfdl.dataloaders.customerDataLoader
+import com.yg.gqlwfdl.dataloaders.pricingDetailsDataLoader
 import com.yg.gqlwfdl.requestContext
 import com.yg.gqlwfdl.services.Company
 import com.yg.gqlwfdl.services.Customer
-import com.yg.gqlwfdl.services.customerDataLoader
+import com.yg.gqlwfdl.services.PricingDetails
 import graphql.schema.DataFetchingEnvironment
 import java.util.concurrent.CompletableFuture
 
+@Suppress("unused")
 /**
  * Resolver for [Company] objects. Provides access to properties which the GraphQL schema exposes of these objects, but
  * which don't exist directly on the domain model object (Customer in this case), and need to be queried for separately.
@@ -22,4 +25,11 @@ class CompanyResolver : DataLoadingResolver(), GraphQLResolver<Company> {
     fun primaryContact(company: Company, env: DataFetchingEnvironment): CompletableFuture<Customer> =
             if (company.primaryContact == null) CompletableFuture.completedFuture(null)
             else prepareDataLoader(env) { env.requestContext.customerDataLoader }.load(company.primaryContact)
+
+    /**
+     * Gets a [CompletableFuture] which, when completed, will return the pricing details for the passed in company.
+     */
+    fun pricingDetails(company: Company, env: DataFetchingEnvironment): CompletableFuture<PricingDetails> =
+            prepareDataLoader(env) { env.requestContext.pricingDetailsDataLoader }.load(company.pricingDetailsId)
+
 }

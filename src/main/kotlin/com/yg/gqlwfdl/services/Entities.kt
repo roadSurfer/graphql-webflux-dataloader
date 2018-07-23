@@ -1,26 +1,44 @@
 package com.yg.gqlwfdl.services
 
-/*
-This file contains the main domain model objects, used in the services layer. In a simple example such as this, each
-of these correlate with a single record in a particular database table (e.g. the "customer" table). However in more
-complex situations such a one-to-one mapping wouldn't necessarily exist. Hence having a separate object from the
-JOOQ-generated Record objects, or a JOOQ-generated DAO or POJO. Also see discussion here for more info:
-https://github.com/jOOQ/jOOQ/issues/5984
-
-Note that it's for a similar reason to this that we don't create a base Service class with any assumptions about how
-each individual service would operate (for example assuming that each service wraps one individual repository). In the
-data access layer it makes sense to have a base Repository class and put assumptions in there about general behaviour
-(e.g. that each repository generally works with one individual database table). However services can be more complex
-and can gather and aggregate data from multiple repository, so no such assumptions are made.
+/**
+ * Abstract base class from which all entities (domain model objects) derive.
+ *
+ * @param TId The data type of the unique [id] of this entity.
+ * @property id The unique identifier of this entity.
  */
+abstract class Entity<TId>(open val id: TId)
 
-data class Customer(val id: Long,
+data class Customer(override val id: Long,
                     var firstName: String,
                     var lastName: String,
                     var companyId: Long,
-                    var outOfOfficeDelegate: Long? = null)
+                    var pricingDetailsId: Long,
+                    var outOfOfficeDelegate: Long? = null) : Entity<Long>(id)
 
-data class Company(val id: Long,
+data class Company(override val id: Long,
                    var name: String,
                    var address: String,
-                   var primaryContact: Long? = null)
+                   var pricingDetailsId: Long,
+                   var primaryContact: Long? = null) : Entity<Long>(id)
+
+data class CompanyPartnership(override val id: Long,
+                              val companyA: Company,
+                              val companyB: Company) : Entity<Long>(id)
+
+data class VatRate(override val id: Long,
+                   var description: String,
+                   var value: Double) : Entity<Long>(id)
+
+data class DiscountRate(override val id: Long,
+                        var description: String,
+                        var value: Double) : Entity<Long>(id)
+
+data class PaymentMethod(override val id: Long,
+                         var description: String,
+                         var charge: Double) : Entity<Long>(id)
+
+data class PricingDetails(override val id: Long,
+                          var description: String,
+                          var vatRate: VatRate,
+                          var discountRate: DiscountRate,
+                          var preferredPaymentMethod: PaymentMethod) : Entity<Long>(id)

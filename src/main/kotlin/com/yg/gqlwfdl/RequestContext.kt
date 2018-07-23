@@ -1,11 +1,9 @@
 package com.yg.gqlwfdl
 
-import com.yg.gqlwfdl.dataaccess.DbConfig
-import com.yg.gqlwfdl.dataloaders.ContextAwareDataLoader
 import com.yg.gqlwfdl.dataloaders.DataLoaderType
-import com.yg.gqlwfdl.services.DataLoaderPrimerRecordListener
+import com.yg.gqlwfdl.dataloaders.EntityDataLoader
+import com.yg.gqlwfdl.services.DataLoaderPrimerEntityCreationListener
 import graphql.ExecutionInput
-import graphql.language.Field
 import graphql.schema.DataFetchingEnvironment
 import org.dataloader.DataLoaderRegistry
 
@@ -29,9 +27,9 @@ class RequestContext(private val dataLoaderRegistry: DataLoaderRegistry) {
      * @param type The type of the data loader being requested.
      */
     fun <K, V> dataLoader(type: DataLoaderType) =
-            dataLoaderRegistry.getDataLoader<K, V>(type.registryKey)!! as ContextAwareDataLoader
+            dataLoaderRegistry.getDataLoader<K, V>(type.registryKey) as EntityDataLoader
 
-    val dataLoaderPrimerRecordListener = DataLoaderPrimerRecordListener(this)
+    val dataLoaderPrimerEntityCreationListener = DataLoaderPrimerEntityCreationListener(this)
 }
 
 /**

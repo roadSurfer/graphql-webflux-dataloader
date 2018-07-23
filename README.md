@@ -35,6 +35,8 @@ startup so you can immediately make a call such as:
 * H2 data access implemented
 * Data loaded by services, and from GraphQL resolvers, primed into data loaders to avoid redundant re-fetching in subsequent resolvers.
 * Joins added (i.e. joins automatically added based on requested GraphQL fields)
+* Repositories based on multiple tables now supported.
+* Entities and GraphQL fields whose data is based on multiple tables supported in join-handling solution.
 
 ## Pre-Requisites
 Some settings in some of the files (e.g. gradle.properties and build.gradle) mean that as things currently stand
@@ -45,10 +47,9 @@ However to get it working in Java 8 should be possible by removing the calls to 
 mentioned, and possibly some other tweaking.
 
 ## To Do
-* Update repositories: they should return entities, not JOOQ records.
-* Add support for repositories based on multiple underlying database tables (and add example of this).
 * Add mutations.
 * Document explaining how it all hangs together.
 * Unit tests.
-* Test error handling (esp in async code)
+* Test error handling (esp in async code).
 * Implement all TODOs in the code.
+* Separate into modules?  Separate framework from example implementation?

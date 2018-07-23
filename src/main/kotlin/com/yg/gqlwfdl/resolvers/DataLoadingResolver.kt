@@ -1,6 +1,7 @@
 package com.yg.gqlwfdl.resolvers
 
-import com.yg.gqlwfdl.dataloaders.ContextAwareDataLoader
+import com.yg.gqlwfdl.dataloaders.EntityDataLoader
+import com.yg.gqlwfdl.services.Entity
 import graphql.schema.DataFetchingEnvironment
 
 /**
@@ -16,9 +17,13 @@ abstract class DataLoadingResolver {
      *
      * @param dataLoaderCreator A function which will create the data loader
      * @param env The current [DataFetchingEnvironment], containing the field which is currently being populated, and
-     * which caused this loader to be called. This is added to the returned [ContextAwareDataLoader]'s
-     * [ContextAwareDataLoader.sourceGraphQLFields].
+     * which caused this loader to be called. This is added to the returned [EntityDataLoader]'s
+     * [EntityDataLoader.sourceGraphQLFields].
      */
-    protected fun <K, V> prepareDataLoader(env: DataFetchingEnvironment, dataLoaderCreator: () -> ContextAwareDataLoader<K, V>) =
-            dataLoaderCreator().also { it.sourceGraphQLFields.add(env.field) }
+    protected fun <TId, TEntity : Entity<TId>> prepareDataLoader(
+            env: DataFetchingEnvironment, dataLoaderCreator: () -> EntityDataLoader<TId, TEntity>)
+            : EntityDataLoader<TId, TEntity> {
+
+        return dataLoaderCreator().also { it.sourceGraphQLFields.add(env.field) }
+    }
 }
