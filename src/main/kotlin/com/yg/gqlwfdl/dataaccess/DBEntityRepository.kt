@@ -132,7 +132,7 @@ abstract class DBEntityRepository<TEntity : Entity<TId>, TId : Any, TRecord : Up
 
         return select
                 .withConditions(conditions)
-                .fetchAsync()
+                .fetchAsync(asyncExecutor)
                 .thenApply {
                     it.map {
                         // If we have an entity creation listener then get all entities and inform it, otherwise just
